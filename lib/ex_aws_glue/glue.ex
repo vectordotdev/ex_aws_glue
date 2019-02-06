@@ -18,11 +18,28 @@ defmodule ExAws.Glue do
   """
   @type table_input :: map
 
+  @type table_name :: String.t()
+
   @namespace "AWSGlue"
 
   #
   # API
   #
+
+  @spec batch_create_partition(database_name, table_name, [{:catalog_id, String.t()}]) ::
+          ExAws.Operation.JSON.t()
+  def batch_create_partition(database_name, table_name, partitions, opts \\ []) do
+    data =
+      opts
+      |> normalize_opts()
+      |> Map.merge(%{
+        "DatabaseName" => database_name,
+        "PartitionInputList" => partitions,
+        "TableName" => table_name
+      })
+
+    request(:batch_create_partition, data)
+  end
 
   @spec create_table(database_name, table_input, [{:catalog_id, String.t()}]) ::
           ExAws.Operation.JSON.t()
@@ -38,15 +55,43 @@ defmodule ExAws.Glue do
     request(:create_table, data)
   end
 
-  @spec get_table(database_name, table_input, [{:catalog_id, String.t()}]) ::
+  @spec delete_table(database_name, table_name, [{:catalog_id, String.t()}]) ::
           ExAws.Operation.JSON.t()
-  def get_table(database_name, name, opts \\ []) do
+  def delete_table(database_name, table_name, opts \\ []) do
     data =
       opts
       |> normalize_opts()
       |> Map.merge(%{
         "DatabaseName" => database_name,
-        "Name" => name
+        "Name" => table_name
+      })
+
+    request(:delete_table, data)
+  end
+
+  @spec get_partitions(database_name, table_name, [{:catalog_id, String.t()}]) ::
+          ExAws.Operation.JSON.t()
+  def get_partitions(database_name, table_name, opts \\ []) do
+    data =
+      opts
+      |> normalize_opts()
+      |> Map.merge(%{
+        "DatabaseName" => database_name,
+        "TableName" => table_name
+      })
+
+    request(:get_partitions, data)
+  end
+
+  @spec get_table(database_name, table_name, [{:catalog_id, String.t()}]) ::
+          ExAws.Operation.JSON.t()
+  def get_table(database_name, table_name, opts \\ []) do
+    data =
+      opts
+      |> normalize_opts()
+      |> Map.merge(%{
+        "DatabaseName" => database_name,
+        "Name" => table_name
       })
 
     request(:get_table, data)
