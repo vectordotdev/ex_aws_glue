@@ -11,6 +11,10 @@ defmodule ExAws.Glue do
 
   @type database_name :: String.t()
 
+  @type partition_input :: map
+
+  @type partition_values :: [String.t()]
+
   @typedoc """
   Table input object:
 
@@ -26,7 +30,9 @@ defmodule ExAws.Glue do
   # API
   #
 
-  @spec batch_create_partition(database_name, table_name, [{:catalog_id, String.t()}]) ::
+  @spec batch_create_partition(database_name, table_name, [partition_input], [
+          {:catalog_id, String.t()}
+        ]) ::
           ExAws.Operation.JSON.t()
   def batch_create_partition(database_name, table_name, partitions, opts \\ []) do
     data =
@@ -39,6 +45,40 @@ defmodule ExAws.Glue do
       })
 
     request(:batch_create_partition, data)
+  end
+
+  @spec batch_delete_partition(database_name, table_name, [partition_values], [
+          {:catalog_id, String.t()}
+        ]) ::
+          ExAws.Operation.JSON.t()
+  def batch_delete_partition(database_name, table_name, partition_values, opts \\ []) do
+    data =
+      opts
+      |> normalize_opts()
+      |> Map.merge(%{
+        "DatabaseName" => database_name,
+        "TableName" => table_name,
+        "PartitionsToDelete" => partition_values
+      })
+
+    request(:batch_delete_partition, data)
+  end
+
+  @spec create_partition(database_name, table_name, partition_input, [
+          {:catalog_id, String.t()}
+        ]) ::
+          ExAws.Operation.JSON.t()
+  def create_partition(database_name, table_name, partition, opts \\ []) do
+    data =
+      opts
+      |> normalize_opts()
+      |> Map.merge(%{
+        "DatabaseName" => database_name,
+        "PartitionInput" => partition,
+        "TableName" => table_name
+      })
+
+    request(:create_partition, data)
   end
 
   @spec create_table(database_name, table_input, [{:catalog_id, String.t()}]) ::
@@ -95,6 +135,20 @@ defmodule ExAws.Glue do
       })
 
     request(:get_table, data)
+  end
+
+  @spec update_table(database_name, table_input, [{:catalog_id, String.t()}]) ::
+          ExAws.Operation.JSON.t()
+  def update_table(database_name, table_input, opts \\ []) do
+    data =
+      opts
+      |> normalize_opts()
+      |> Map.merge(%{
+        "DatabaseName" => database_name,
+        "TableInput" => table_input
+      })
+
+    request(:update_table, data)
   end
 
   #
